@@ -39,24 +39,26 @@
 : ${OCF_RESKEY_CRM_meta_master_max=1}
 : ${OCF_RESKEY_CRM_meta_master_node_max=1}
 
-: ${OCF_RESKEY_repmgr=/usr/bin/repmgr}
-: ${OCF_RESKEY_repmgr_conf=/var/lib/pgsql/repmgr/repmgr.conf}
-: ${OCF_RESKEY_repmgr_clone_opt="-d postgres -U repmgr -R postgres"}
-: ${OCF_RESKEY_pgctl=/usr/bin/pg_ctl}
 : ${OCF_RESKEY_psql=/usr/bin/psql}
-: ${OCF_RESKEY_pgdata=/var/lib/pgsql/data}
-: ${OCF_RESKEY_pgconfig=${OCF_RESKEY_pgdata}/postgresql.conf}
+: ${OCF_RESKEY_pgetc=/etc/postgresql/9.0/main}
+: ${OCF_RESKEY_pgdata=/var/lib/postgresql/9.0/main}
+: ${OCF_RESKEY_pgbin=/usr/lib/postgresql/9.0/bin}
+: ${OCF_RESKEY_pgctl=${OCF_RESKEY_pgbin}/pg_ctl}
+: ${OCF_RESKEY_pgconfig=${OCF_RESKEY_pgetc}/postgresql.conf}
 : ${OCF_RESKEY_pgdba=postgres}
 : ${OCF_RESKEY_pgport=5432}
 : ${OCF_RESKEY_start_opt="-p $OCF_RESKEY_pgport"}
 : ${OCF_RESKEY_pgdb=template1}
-: ${OCF_RESKEY_logfile=/dev/null}
+: ${OCF_RESKEY_logfile=/var/log/postgresql/postgresql-9.0-main.log}
 : ${OCF_RESKEY_stop_escalate=30}
 : ${OCF_RESKEY_master_score=100}
 : ${OCF_RESKEY_slave_score=50}
+: ${OCF_RESKEY_repmgr=/usr/bin/repmgr}
+: ${OCF_RESKEY_repmgr_conf=${OCF_RESKEY_pgetc}/repmgr.conf}
+: ${OCF_RESKEY_repmgr_clone_opt="-d postgres -U repmgr -R postgres"}
 
 CRM_MASTER="${HA_SBIN_DIR}/crm_master -l reboot"
-PIDFILE=${OCF_RESKEY_pgdata}/postmaster.pid
+PIDFILE=/var/run/postgresql/9.0-main.pid
 SOCKETDIR=/var/run/postgresql
 
 #######################################################################
@@ -286,7 +288,7 @@ pg_check_pid() {
 run_repmgr() {
 	# pgctl should be in PATH (set it in /etc/login.defs or ~postgres/.profile)
 	ocf_log info "Run as $OCF_RESKEY_pgdba: ${OCF_RESKEY_repmgr} $@"
-	su --login $OCF_RESKEY_pgdba -c "${OCF_RESKEY_repmgr} $*" 2>&1 >> /dev/r.out
+	su --login $OCF_RESKEY_pgdba -c "PATH=$PATH:${OCF_RESKEY_pgbin} ${OCF_RESKEY_repmgr} $*" 2>&1 >> /dev/r.out
 	rc=$?
 	# 100 = master state
 	if [ $rc -ne 0 -a $rc -ne 100 ]; then 
@@ -593,10 +595,10 @@ pgsql_validate_all() {
 	check_config $OCF_RESKEY_pgconfig
 	check_config $OCF_RESKEY_repmgr_conf
 	
-	if ! su --login $OCF_RESKEY_pgdba -c "type -p `basename $OCF_RESKEY_pgctl`" > /dev/null ; then
-		ocf_log err "`basename $OCF_RESKEY_pgctl` should be in PATH for user $OCF_RESKEY_pgdba"
-		return $OCF_ERR_INSTALLED
-	fi
+	#if ! su --login $OCF_RESKEY_pgdba -c "type -p `basename $OCF_RESKEY_pgctl`" > /dev/null ; then
+	#	ocf_log err "`basename $OCF_RESKEY_pgctl` should be in PATH for user $OCF_RESKEY_pgdba"
+	#	return $OCF_ERR_INSTALLED
+	#fi
 	
 	return $OCF_SUCCESS
 }
