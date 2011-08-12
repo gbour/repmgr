@@ -147,7 +147,7 @@ User that owns PostgreSQL.
 
 <parameter name="pghost" unique="0" required="0">
 <longdesc lang="en">
-Hostname/IP Addreess where PosrgeSQL is listening
+Hostname/IP Address where PostgreSQL is listening
 </longdesc>
 <shortdesc lang="en">pghost</shortdesc>
 <content type="string" default="" />
@@ -301,7 +301,7 @@ pg_state_check() {
 	then
 		return $OCF_NOT_RUNNING
 	else
-		ocf_log info "PostgreSQL proccess exist..."
+		ocf_log info "PostgreSQL process exist..."
 	fi
 
 	run_repmgr -f ${OCF_RESKEY_repmgr_conf} state check
