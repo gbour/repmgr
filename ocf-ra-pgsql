@@ -322,7 +322,7 @@ pg_start() {
 	mkdir -p $SOCKETDIR &&	\
 	chown $OCF_RESKEY_pgdba. $SOCKETDIR && \
 	chmod 2775 $SOCKETDIR
-	run_as_pg ${OCF_RESKEY_pgctl} start -w -D ${OCF_RESKEY_pgdata} $OCF_RESKEY_ctl_opt -l ${OCF_RESKEY_logfile} -o "'-c config_file=${OCF_RESKEY_pgconfig}'" -o "'$OCF_RESKEY_start_opt'"
+	run_as_pg ${OCF_RESKEY_pgctl} start -w -D ${OCF_RESKEY_pgdata} $OCF_RESKEY_ctl_opt -l ${OCF_RESKEY_logfile} -o "'-c config_file=${OCF_RESKEY_pgconfig} $OCF_RESKEY_start_opt'"
 	sleep 10
 }
 
